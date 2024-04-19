@@ -22,7 +22,7 @@ class Lcd(Frame):
     def __init__(self, window):
         super().__init__(window, bg="black")
         # make the GUI fullscreen
-        window.attributes("-fullscreen", True)
+        window.after(100, window.attributes, "-fullscreen", True)
         # we need to know about the timer (7-segment display) to be able to pause/unpause it
         self._timer = None
         # we need to know about the pushbutton to turn off its LED when the program exits
@@ -137,8 +137,12 @@ class PhaseThread(Thread):
         self._failed = False
         # phases have a value (e.g., a pushbutton can be True/Pressed or False/Released, several jumper wires can be "cut"/False, etc)
         self._value = None
+        self._prev_value = None
         # phase threads are either running or not
         self._running = False
+class NumericPhase(PhaseThread):
+    def run(self):
+        pass
 
 # the timer phase
 class Timer(PhaseThread):
@@ -226,7 +230,7 @@ class Keypad(PhaseThread):
             return self._value
 
 # the jumper wires phase
-class Wires(PhaseThread):
+class Wires(NumericPhase):
     def __init__(self, component, target, name="Wires"):
         super().__init__(name, component, target)
 
@@ -241,7 +245,7 @@ class Wires(PhaseThread):
             return "DEFUSED"
         else:
             # TODO
-            pass
+            return "no"
 
 # the pushbutton phase
 class Button(PhaseThread):
@@ -295,7 +299,7 @@ class Button(PhaseThread):
             return str("Pressed" if self._value else "Released")
 
 # the toggle switches phase
-class Toggles(PhaseThread):
+class Toggles(NumericPhase):
     def __init__(self, component, target, name="Toggles"):
         super().__init__(name, component, target)
 
@@ -310,4 +314,4 @@ class Toggles(PhaseThread):
             return "DEFUSED"
         else:
             # TODO
-            pass
+            return "no"
