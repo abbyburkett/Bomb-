@@ -236,8 +236,16 @@ class Wires(NumericPhase):
 
     # runs the thread
     def run(self):
-        # TODO
-        pass
+        self._running = True
+        while (self._running):
+        if (self._value == self._target):
+            self._defused = True
+        elif (self._value != self._prev_value):
+            # do some more processing
+            # (like checking which toggle/wire was actually changed)
+            # then note that the value has changed and been processed
+            self._prev_value = self._value
+        sleep(0.1)
 
     # returns the jumper wires state as a string
     def __str__(self):
@@ -305,8 +313,17 @@ class Toggles(NumericPhase):
 
     # runs the thread
     def run(self):
-        # TODO
-        pass
+        self._running = True
+        while (self._running):
+        if (self._value == self._target):
+            self._defused = True
+        elif (self._value != self._prev_value):
+            # do some more processing
+            # (like checking which toggle/wire was actually changed)
+            # then note that the value has changed and been processed
+            self._prev_value = self._value
+        sleep(0.1)
+
 
     # returns the toggle switches state as a string
     def __str__(self):
