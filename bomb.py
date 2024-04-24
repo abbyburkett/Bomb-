@@ -156,6 +156,8 @@ def strike():
     
     # note the strike
     strikes_left -= 1
+    if strikes_left == 3:
+        timer._interval = 0.5
 
 # turns off the bomb
 def turn_off():
