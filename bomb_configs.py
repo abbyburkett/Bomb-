@@ -92,33 +92,39 @@ if (RPi):
 #  the sum of the digits should be in the range 1..15 to set the toggles target
 #  the first three letters should be distinct and in the range 0..4 such that A=0, B=1, etc, to match the jumper wires
 #  the last letter should be outside of the range
-def genSerial():
-    # set the digits (used in the toggle switches phase)
-    serial_digits = []
-    toggle_value = randint(1, 15)
-    # the sum of the digits is the toggle value
-    while (len(serial_digits) < 3 or toggle_value - sum(serial_digits) > 0):
-        d = randint(0, min(9, toggle_value - sum(serial_digits)))
-        serial_digits.append(d)
+def genserial():
+    colors = {
+        "FFFF66": "Yellow",
+        "00CC33": "Green",
+        "FF4500": "Red",
+        "FFa500": "Orange",
+        "a52a2a": "Brown"
+    }
 
-    # set the letters (used in the jumper wires phase)
-    jumper_indexes = [ 0 ] * 5
-    while (sum(jumper_indexes) < 3):
-        jumper_indexes[randint(0, len(jumper_indexes) - 1)] = 1
-    jumper_value = int("".join([ str(n) for n in jumper_indexes ]), 2)
-    # the letters indicate which jumper wires must be "cut"
-    jumper_letters = [ chr(i + 65) for i, n in enumerate(jumper_indexes) if n == 1 ]
+    # Choose a random color code
+    color_code = random.choice(list(colors.keys()))
+    
+    # Calculate toggle value
+    toggle_value = (bin(color_sum(color_code)))
+    print(toggle_value)
+    
+    # Get the actual color name corresponding to the color code
+    jumper_wire = colors[color_code]
+    print(jumper_wire)
+    # Form serial number
+    random_letter1 = random.choice([chr(n) for n in range(70, 91)])
+    random_letter2 = random.choice([chr(n) for n in range(70, 91)])
+    serial = random_letter1 + color_code + random_letter2
+    print(serial)
+    
+    return serial, toggle_value, jumper_wire
 
-    # form the serial number
-    serial = [ str(d) for d in serial_digits ] + jumper_letters
-    # and shuffle it
-    shuffle(serial)
-    # finally, add a final letter (F..Z)
-    serial += [ choice([ chr(n) for n in range(70, 91) ]) ]
-    # and make the serial number a string
-    serial = "".join(serial)
-
-    return serial, toggle_value, jumper_value
+def color_sum(color):
+    char_list = [char for char in color if char.isdigit()]
+    total = 0
+    for char in char_list:
+        total += int(char)
+    return total
 
 # generates the keypad combination from a keyword and rotation key
 def genKeypadCombination():
@@ -181,7 +187,7 @@ def genKeypadCombination():
 #  serial: the bomb's serial number
 #  toggles_target: the toggles phase defuse value
 #  wires_target: the wires phase defuse value
-serial, toggles_target, wires_target = genSerial()
+serial_number, toggle_value, jumper_wire = genserial()
 
 # generate the combination for the keypad phase
 #  keyword: the plaintext keyword for the lookup table
@@ -197,13 +203,13 @@ button_color = choice(["R", "G", "B"])
 button_target = None
 # G is the first numeric digit in the serial number
 if (button_color == "G"):
-    button_target = [ n for n in serial if n.isdigit() ][0]
+    button_target = [ n for n in serial_number if n.isdigit() ][0]
 # B is the last numeric digit in the serial number
 elif (button_color == "B"):
-    button_target = [ n for n in serial if n.isdigit() ][-1]
+    button_target = [ n for n in serial_number if n.isdigit() ][-1]
 
 if (DEBUG):
-    print(f"Serial number: {serial}")
+    print(f"Serial number: {serial_number}")
     print(f"Toggles target: {bin(toggles_target)[2:].zfill(4)}/{toggles_target}")
     print(f"Wires target: {bin(wires_target)[2:].zfill(5)}/{wires_target}")
     print(f"Keypad target: {keypad_target}/{passphrase}/{keyword}/{cipher_keyword}(rot={rot})")
@@ -214,7 +220,7 @@ boot_text = f"Booting...\n\x00\x00"\
             f"*Kernel v3.1.4-159 loaded.\n"\
             f"Initializing subsystems...\n\x00"\
             f"*System model: 102BOMBv4.2\n"\
-            f"*Serial number: {serial}\n"\
+            f"*Serial number: {serial_number}\n"\
             f"Encrypting keypad...\n\x00"\
             f"*Keyword: {cipher_keyword}; key: {rot}\n"\
             f"*{' '.join(ascii_uppercase)}\n"\
