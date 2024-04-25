@@ -109,6 +109,8 @@ def genSerial():
     # Sum of numerical values of hexadecimal digits
     toggle_value = sum(int(digit, 16) for digit in wire_color_code)
 
+    jumper_value = WIRE_COLORS[wire_color_code]
+
     # Convert sum to binary
     toggle_binary = bin(toggle_value)[2:]
 
