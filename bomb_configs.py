@@ -106,13 +106,16 @@ def genSerial():
     # Generate wire color code
     wire_color_code = choice(list(WIRE_COLORS.keys()))
 
+    # Extract numerical digits from the hexadecimal color code
+    numerical_digits = [int(digit) for digit in wire_color_code if digit.isdigit()]
+
     # Sum of numerical values of hexadecimal digits
-    toggle_value = sum(int(digit, 16) for digit in wire_color_code)
+    toggle_value = sum(numerical_digits)
 
     jumper_value = WIRE_COLORS[wire_color_code]
 
     # Convert sum to binary
-    toggle_binary = bin(toggle_value)[2:]
+    toggle_binary = bin(toggle_value)[2:].zfill(4)
 
     random_letter1 = choice([chr(n) for n in range(70, 91)])
     random_letter2 = choice([chr(n) for n in range(70, 91)])
