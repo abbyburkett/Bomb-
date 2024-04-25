@@ -92,39 +92,31 @@ if (RPi):
 #  the sum of the digits should be in the range 1..15 to set the toggles target
 #  the first three letters should be distinct and in the range 0..4 such that A=0, B=1, etc, to match the jumper wires
 #  the last letter should be outside of the range
-def genserial():
-    colors = {
-        "FFFF66": "Yellow",
-        "00CC33": "Green",
-        "FF4500": "Red",
-        "FFa500": "Orange",
-        "a52a2a": "Brown"
-    }
 
-    # Choose a random color code
-    color_code = random.choice(list(colors.keys()))
-    
-    # Calculate toggle value
-    toggle_value = (bin(color_sum(color_code)))
-    print(toggle_value)
-    
-    # Get the actual color name corresponding to the color code
-    jumper_wire = colors[color_code]
-    print(jumper_wire)
-    # Form serial number
-    random_letter1 = random.choice([chr(n) for n in range(70, 91)])
-    random_letter2 = random.choice([chr(n) for n in range(70, 91)])
-    serial = random_letter1 + color_code + random_letter2
-    print(serial)
-    
-    return serial, toggle_value, jumper_wire
+WIRE_COLORS = {
+    "a52a2a": "Brown",
+    "FF4500": "Red",
+    "FFa500": "Orange",
+    "FFFF66": "Yellow",
+    "00CC33": "Green"
+}
 
-def color_sum(color):
-    char_list = [char for char in color if char.isdigit()]
-    total = 0
-    for char in char_list:
-        total += int(char)
-    return total
+# Modify gen_serial to include wire color codes
+def genSerial():
+    # Generate wire color code
+    wire_color_code = choice(list(WIRE_COLORS.keys()))
+
+    # Sum of numerical values of hexadecimal digits
+    toggle_value = sum(int(digit, 16) for digit in wire_color_code)
+
+    # Convert sum to binary
+    toggle_binary = bin(toggle_value)[2:]
+
+    random_letter1 = choice([chr(n) for n in range(70, 91)])
+    random_letter2 = choice([chr(n) for n in range(70, 91)])
+    serial =  random_letter1 + wire_color_code + random_letter2
+
+    return serial, toggle_binary, jumper_value, wire_color_code
 
 # generates the keypad combination from a keyword and rotation key
 def genKeypadCombination():
@@ -187,8 +179,7 @@ def genKeypadCombination():
 #  serial: the bomb's serial number
 #  toggles_target: the toggles phase defuse value
 #  wires_target: the wires phase defuse value
-serial_number, toggle_value, jumper_wire = genserial()
-
+serial, toggles_target, wires_target, wire_color_code = genSerial()
 # generate the combination for the keypad phase
 #  keyword: the plaintext keyword for the lookup table
 #  cipher_keyword: the encrypted keyword for the lookup table
@@ -203,13 +194,13 @@ button_color = choice(["R", "G", "B"])
 button_target = None
 # G is the first numeric digit in the serial number
 if (button_color == "G"):
-    button_target = [ n for n in serial_number if n.isdigit() ][0]
+    button_target = [ n for n in serial if n.isdigit() ][0]
 # B is the last numeric digit in the serial number
 elif (button_color == "B"):
-    button_target = [ n for n in serial_number if n.isdigit() ][-1]
+    button_target = [ n for n in serial if n.isdigit() ][-1]
 
 if (DEBUG):
-    print(f"Serial number: {serial_number}")
+    print(f"Serial number: {serial}")
     print(f"Toggles target: {bin(toggles_target)[2:].zfill(4)}/{toggles_target}")
     print(f"Wires target: {bin(wires_target)[2:].zfill(5)}/{wires_target}")
     print(f"Keypad target: {keypad_target}/{passphrase}/{keyword}/{cipher_keyword}(rot={rot})")
@@ -220,9 +211,10 @@ boot_text = f"Booting...\n\x00\x00"\
             f"*Kernel v3.1.4-159 loaded.\n"\
             f"Initializing subsystems...\n\x00"\
             f"*System model: 102BOMBv4.2\n"\
-            f"*Serial number: {serial_number}\n"\
+            f"*Serial number: {serial}\n"\
             f"Encrypting keypad...\n\x00"\
             f"*Keyword: {cipher_keyword}; key: {rot}\n"\
             f"*{' '.join(ascii_uppercase)}\n"\
             f"*{' '.join([str(n % 10) for n in range(26)])}\n"\
             f"Rendering phases...\x00"
+
