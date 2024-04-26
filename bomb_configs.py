@@ -7,12 +7,12 @@
 # constants
 DEBUG = False        # debug mode?
 RPi = True           # is this running on the RPi?
-ANIMATE = True       # animate the LCD text?
+ANIMATE = False       # animate the LCD text?
 SHOW_BUTTONS = False # show the Pause and Quit buttons on the main LCD GUI?
 COUNTDOWN = 300      # the initial bomb countdown value (seconds)
 NUM_STRIKES = 5      # the total strikes allowed before the bomb "explodes"
 NUM_PHASES = 4       # the total number of initial active bomb phases
-
+EXPLOSION_SOUND = "hq-explosion-6288.mp3"
 # imports
 from random import randint, shuffle, choice
 from string import ascii_uppercase
@@ -52,7 +52,7 @@ if (RPi):
 # the jumper wire pins
 if (RPi):
     # the pins
-    component_wires = [DigitalInOut(i) for i in (board.D14, board.D15, board.D18, board.D23, board.D24)]
+    component_wires = [DigitalInOut(pin) for pin in (board.D14, board.D15, board.D18, board.D23, board.D24)]
     for pin in component_wires:
         # pins are input and pulled down
         pin.direction = Direction.INPUT
@@ -105,17 +105,16 @@ WIRE_COLORS = {
 def genSerial():
     # Generate wire color code
     wire_color_code = choice(list(WIRE_COLORS.keys()))
-
-    # Extract numerical digits from the hexadecimal color code
+    print(wire_color_code)
+    
     numerical_digits = [int(digit) for digit in wire_color_code if digit.isdigit()]
-
     # Sum of numerical values of hexadecimal digits
     toggle_value = sum(numerical_digits)
-
+    print(toggle_value)
     jumper_value = WIRE_COLORS[wire_color_code]
-
     # Convert sum to binary
     toggle_binary = bin(toggle_value)[2:].zfill(4)
+    print(toggle_binary)
 
     random_letter1 = choice([chr(n) for n in range(70, 91)])
     random_letter2 = choice([chr(n) for n in range(70, 91)])
@@ -177,6 +176,8 @@ def genKeypadCombination():
 
     return keyword, cipher_keyword, rot, combination, passphrase
 
+def gen_toggles_target():
+    return sum([randint(0,1) * 2 ** i for i in range(4)])
 ###############################
 # generate the bomb's specifics
 ###############################
@@ -222,4 +223,3 @@ boot_text = f"Booting...\n\x00\x00"\
             f"*{' '.join(ascii_uppercase)}\n"\
             f"*{' '.join([str(n % 10) for n in range(26)])}\n"\
             f"Rendering phases...\x00"
-
