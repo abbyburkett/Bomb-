@@ -8,7 +8,8 @@
 from bomb_configs import *
 # import the phases
 from bomb_phases import *
-
+import pygame
+pygame.init()
 ###########
 # functions
 ###########
@@ -136,6 +137,7 @@ def check_phases():
         # turn off the bomb and render the conclusion GUI
         turn_off()
         gui.after(1000, gui.conclusion, False)
+        pygame.mixer.Sound(EXPLOSION_SOUND).play()
         # stop checking phases
         return
 
