@@ -140,11 +140,6 @@ class PhaseThread(Thread):
         # phase threads are either running or not
         self._running = False
          
-    def run(self):
-         pass
-    def __str__(self):
-        pass
-    
 class NumericPhase(PhaseThread):
     def __init__(self,  name, component=None, target=None):
         super().__init__(name, component, target)
@@ -155,7 +150,7 @@ class NumericPhase(PhaseThread):
             if (self._value == self._target):
                 self._defused = True
             elif (self._value != self._prev_value):
-                #do some processing, check if toggle
+                #do some processing, check if toggle was changed
                 self._prev_value = self._value
             sleep(0.1)
                 
