@@ -94,11 +94,11 @@ if (RPi):
 #  the last letter should be outside of the range
 
 WIRE_COLORS = {
-    "a52a2a": "Brown",
-    "FF4500": "Red",
-    "FFa500": "Orange",
-    "FFFF66": "Yellow",
-    "00CC33": "Green"
+    "a52a2a": board.D14,
+    "FF4500": board.D15,
+    "FFa500": board.D18,
+    "FFFF66": board.D23,
+    "00CC33": board.D24
 }
 
 # Modify gen_serial to include wire color codes
