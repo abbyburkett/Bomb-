@@ -176,8 +176,8 @@ def genKeypadCombination():
 
     return keyword, cipher_keyword, rot, combination, passphrase
 
-def gen_toggles_target():
-    return sum([randint(0,1) * 2 ** i for i in range(4)])
+#def gen_toggles_target():
+    #return sum([randint(0,1) * 2 ** i for i in range(4)])
 ###############################
 # generate the bomb's specifics
 ###############################
