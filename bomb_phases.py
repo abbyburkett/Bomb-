@@ -137,12 +137,28 @@ class PhaseThread(Thread):
         self._failed = False
         # phases have a value (e.g., a pushbutton can be True/Pressed or False/Released, several jumper wires can be "cut"/False, etc)
         self._value = None
-        self._prev_value = None
         # phase threads are either running or not
         self._running = False
-class NumericPhase(PhaseThread):
+         
     def run(self):
+         pass
+    def __str__(self):
         pass
+    
+class NumericPhase(PhaseThread):
+    def __init__(self,  name, component=None, target=None):
+        super().__init__(name, component, target)
+        self._prev_value = None
+    def run(self):
+        self._running = True
+        while (self._running):
+            if (self._value == self._target):
+                self._defused = True
+            elif (self._value != self._prev_value):
+                #do some processing, check if toggle
+                self._prev_value = self._value
+            sleep(0.1)
+                
 
 # the timer phase
 class Timer(PhaseThread):
@@ -230,22 +246,20 @@ class Keypad(PhaseThread):
             return self._value
 
 # the jumper wires phase
-class Wires(NumericPhase):
+class Wires(PhaseThread):
     def __init__(self, component, target, name="Wires"):
-        super().__init__(name, component, target)
-
-    # runs the thread
+         super().__init__(name, component, target)
+ 
+     # runs the thread
     def run(self):
         self._running = True
-        while (self._running):
-        if (self._value == self._target):
-            self._defused = True
-        elif (self._value != self._prev_value):
-            # do some more processing
-            # (like checking which toggle/wire was actually changed)
-            # then note that the value has changed and been processed
-            self._prev_value = self._value
-        sleep(0.1)
+        while self._running:
+            if self._value == self._target:
+                self._defused = True
+            else:
+                self._failed = True
+                self._running = False
+            sleep(0.1)
 
     # returns the jumper wires state as a string
     def __str__(self):
@@ -253,7 +267,7 @@ class Wires(NumericPhase):
             return "DEFUSED"
         else:
             # TODO
-            return "no"
+            return "NOT DEFUSED"
 
 # the pushbutton phase
 class Button(PhaseThread):
@@ -310,25 +324,25 @@ class Button(PhaseThread):
 class Toggles(NumericPhase):
     def __init__(self, component, target, name="Toggles"):
         super().__init__(name, component, target)
-
+        
     # runs the thread
     def run(self):
-        self._running = True
-        while (self._running):
-        if (self._value == self._target):
-            self._defused = True
-        elif (self._value != self._prev_value):
-            # do some more processing
-            # (like checking which toggle/wire was actually changed)
-            # then note that the value has changed and been processed
+        self_running = True
+        while self._running:
+            if self._value == self._target:
+                self._defused = True
+                break
+            if self._value != self._prev_value:
+                if self._value == self._target:
+                    self.defused = True
             self._prev_value = self._value
-        sleep(0.1)
-
-
+            if self._value == self._prev_value:
+                sleep(0.1)
+        
     # returns the toggle switches state as a string
     def __str__(self):
         if (self._defused):
             return "DEFUSED"
         else:
             # TODO
-            return "no"
+            return str(self._value)
