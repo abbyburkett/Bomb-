@@ -105,22 +105,22 @@ WIRE_COLORS = {
 def genSerial():
     # Generate wire color code
     wire_color_code = choice(list(WIRE_COLORS.keys()))
-    print(wire_color_code)
+    #print(wire_color_code)
     
     numerical_digits = [int(digit) for digit in wire_color_code if digit.isdigit()]
     # Sum of numerical values of hexadecimal digits
     toggle_value = sum(numerical_digits)
-    print(toggle_value)
+    #print(toggle_value)
     jumper_value = WIRE_COLORS[wire_color_code]
     # Convert sum to binary
-    toggle_binary = bin(toggle_value)[2:].zfill(4)
-    print(toggle_binary)
+    #toggle_binary = bin(toggle_value)[2:].zfill(4)
+    #print(toggle_binary)
 
     random_letter1 = choice([chr(n) for n in range(70, 91)])
     random_letter2 = choice([chr(n) for n in range(70, 91)])
     serial =  random_letter1 + wire_color_code + random_letter2
 
-    return serial, toggle_binary, jumper_value, wire_color_code
+    return serial, toggle_value, jumper_value, wire_color_code
 
 # generates the keypad combination from a keyword and rotation key
 def genKeypadCombination():
