@@ -141,18 +141,60 @@ class PhaseThread(Thread):
         self._running = False
          
 class NumericPhase(PhaseThread):
-    def __init__(self,  name, component=None, target=None):
+    def __init__(self, name, component=None, target=None, display_length=0):
         super().__init__(name, component, target)
-        self._prev_value = None
+        # the default value is the current state of the component
+        self._value = self._get_int_state()
+        # we need to know the previous state to detect state change
+        self._prev_value = self._value
+        # we need to know the display length (character width) of the pin states (for the GUI)
+        self._display_length = display_length
+
+    # runs the thread
     def run(self):
         self._running = True
         while (self._running):
+            # get the component value
+            self._value = self._get_int_state()
+            # the component value is correct -> phase defused
             if (self._value == self._target):
                 self._defused = True
+            # the component state has changed
             elif (self._value != self._prev_value):
-                #do some processing, check if toggle was changed
+                # one or more component states are incorrect -> phase failed (strike)
+                if (not self._check_state()):
+                    self._failed = True
+                # note the updated state
                 self._prev_value = self._value
             sleep(0.1)
+
+    # checks the component for an incorrect state (only internally called)
+    def _check_state(self):
+        # get a list (True/False) of the current, previous, and valid (target) component states
+        states = self._get_bool_state()
+        prev_states = [ bool(int(c)) for c in bin(self._prev_value)[2:].zfill(self._display_length) ]
+        valid_states = [ bool(int(c)) for c in bin(self._target)[2:].zfill(self._display_length) ]
+        # go through each component state
+        for i in range(len(states)):
+            # a component state has changed *and* it is in an invalid state -> phase failed (strike)
+            if (states[i] != prev_states[i] and states[i] != valid_states[i]):
+                return False
+        return True
+
+    # returns the state of the component as a list (True/False)
+    def _get_bool_state(self):
+        return [ pin.value for pin in self._component ]
+
+    # returns the state of the component as an integer
+    def _get_int_state(self):
+        return int("".join([ str(int(n)) for n in self._get_bool_state() ]), 2)
+
+    # returns the state of the component as a string
+    def __str__(self):
+        if (self._defused):
+            return "DEFUSED"
+        else:
+            return f"{bin(self._value)[2:].zfill(self._display_length)}/{self._value}"
                 
 
 # the timer phase
@@ -317,27 +359,6 @@ class Button(PhaseThread):
 
 # the toggle switches phase
 class Toggles(NumericPhase):
-    def __init__(self, component, target, name="Toggles"):
-        super().__init__(name, component, target)
-        
-    # runs the thread
-    def run(self):
-        self_running = True
-        while self._running:
-            if self._value == self._target:
-                self._defused = True
-                break
-            if self._value != self._prev_value:
-                if self._value == self._target:
-                    self.defused = True
-            self._prev_value = self._value
-            if self._value == self._prev_value:
-                sleep(0.1)
-        
-    # returns the toggle switches state as a string
-    def __str__(self):
-        if (self._defused):
-            return "DEFUSED"
-        else:
-            # TODO
-            return str(self._value)
+    def __init__(self, component, target, display_length, name="Toggles"):
+        super().__init__(name, component, target, display_length)
+
