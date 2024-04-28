@@ -140,6 +140,11 @@ class PhaseThread(Thread):
         # phase threads are either running or not
         self._running = False
          
+    def run(self):
+         pass
+    def __str__(self):
+        pass
+ 
 class NumericPhase(PhaseThread):
     def __init__(self, name, component=None, target=None, display_length=0):
         super().__init__(name, component, target)
@@ -194,8 +199,16 @@ class NumericPhase(PhaseThread):
         if (self._defused):
             return "DEFUSED"
         else:
-            return f"{bin(self._value)[2:].zfill(self._display_length)}/{self._value}"
-                
+            return f"{bin(self._value)[2:].zfill(self._display_length)}" 
+ 
+ 
+ 
+# class NumericPhase(PhaseThread):
+#     def __init__(self,  name, component=None, target=None):
+#         super().__init__(name, component, target)
+#     
+#     def run(self):
+#         pass
 
 # the timer phase
 class Timer(PhaseThread):
@@ -282,29 +295,48 @@ class Keypad(PhaseThread):
         else:
             return self._value
 
-# the jumper wires phase
-class Wires(PhaseThread):
-    def __init__(self, component, target, name="Wires"):
-         super().__init__(name, component, target)
- 
-     # runs the thread
-    def run(self):
-        self._running = True
-        while self._running:
-            if self._value == self._target:
-                self._defused = True
-            else:
-                self._failed = True
-                self._running = False
-            sleep(0.1)
+
+
+class Wires(NumericPhase):
+    def __init__(self, component, target, display_length, name="Wires"):
+        super().__init__(name, component, target, display_length)
 
     # returns the jumper wires state as a string
     def __str__(self):
         if (self._defused):
             return "DEFUSED"
         else:
-            # TODO
             return "NOT DEFUSED"
+# # the jumper wires phase
+# class Wires(PhaseThread):
+#     def __init__(self, component, target, name="Wires"):
+#          super().__init__(name, component, target)
+# 
+#     def get_value(self):
+#         value = None
+#         for pin in self._component:
+#             print(pin.value)
+#                
+#             
+#      # runs the thread
+#     def run(self):
+#         self._running = True
+#         while self._running:
+#             self._value = self.get_value
+#             if self._value == self._target:
+#                 self._defused = True
+#             else:
+#                 self._failed = True
+#                 self._running = False
+#             sleep(0.1)
+# 
+#     # returns the jumper wires state as a string
+#     def __str__(self):
+#         if (self._defused):
+#             return "DEFUSED"
+#         else:
+#             # TODO
+#             return "NOT DEFUSED"
 
 # the pushbutton phase
 class Button(PhaseThread):
@@ -356,9 +388,70 @@ class Button(PhaseThread):
             return "DEFUSED"
         else:
             return str("Pressed" if self._value else "Released")
-
-# the toggle switches phase
+        
+        
+        
+        
 class Toggles(NumericPhase):
     def __init__(self, component, target, display_length, name="Toggles"):
-        super().__init__(name, component, target, display_length)
+        super().__init__(name, component, target, display_length)       
+
+
+# #the toggle switches phase
+# class Toggles(PhaseThread):
+#     def __init__(self, component, target, name="Toggles"):
+#         super().__init__(name, component, target)
+#         self._prev_value = ""
+#         
+#         
+#     def get_bin_value(self):
+#         value = ""
+#         for pin in self._component:
+#             if (pin.value):
+#                 value += "1"
+#             else:
+#                 value += "0"
+#         return value
+#     
+#     def get_value(self):
+#         value = self.get_bin_value()
+#         value = int(value, 2)
+#         return value
+#         
+#     # runs the thread
+#     def run(self):
+#         self._running = True
+#         while self._running:
+#             #self._failed = False
+#             self._value = self.get_value()
+#             if self._value == self._target:
+#                 self._defused = True
+#             elif self._value != self._prev_value:
+#                 if self._value != self._target:
+#                     self._failed = True
+# #                 for i in range(len(self._value)):
+# #                     if self._value[i] != self._target[i]:
+# #                         self._defused = False
+# #                         self._failed = True
+# #             self._prev_value = self._value
+# #             sleep(0.1)
+# #             else:
+# #                 if self._value[i] != self._target[i]:
+# #                     self._failed = True
+# #         sleep(0.1)
+#             
+#                      
+#                       
+#                
+# 
+#         
+#     # returns the toggle switches state as a string
+#     def __str__(self):
+#         if (self._defused):
+#             return "DEFUSED"
+#         else:
+#             # TODO
+#             return "NOT DEFUSED"
+        
+
 
