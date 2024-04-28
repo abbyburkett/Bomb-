@@ -5,10 +5,10 @@
 #################################
 
 # constants
-DEBUG = False        # debug mode?
+DEBUG = 1       # debug mode?
 RPi = True           # is this running on the RPi?
 ANIMATE = False       # animate the LCD text?
-SHOW_BUTTONS = False # show the Pause and Quit buttons on the main LCD GUI?
+SHOW_BUTTONS = 1 # show the Pause and Quit buttons on the main LCD GUI?
 COUNTDOWN = 300      # the initial bomb countdown value (seconds)
 NUM_STRIKES = 5      # the total strikes allowed before the bomb "explodes"
 NUM_PHASES = 4       # the total number of initial active bomb phases
@@ -53,10 +53,14 @@ if (RPi):
 if (RPi):
     # the pins
     component_wires = [DigitalInOut(pin) for pin in (board.D14, board.D15, board.D18, board.D23, board.D24)]
+    #bin_wires = []
     for pin in component_wires:
+        #bin_wires.append(bin(pin.value)[2:])
+        
         # pins are input and pulled down
         pin.direction = Direction.INPUT
         pin.pull = Pull.DOWN
+    #print(bin_wires)
 
 # pushbutton
 # 6 pins: 4, 17, 27, 22, 3V3, 3V3
@@ -105,22 +109,30 @@ WIRE_COLORS = {
 def genSerial():
     # Generate wire color code
     wire_color_code = choice(list(WIRE_COLORS.keys()))
-    #print(wire_color_code)
+    print(wire_color_code)
     
     numerical_digits = [int(digit) for digit in wire_color_code if digit.isdigit()]
     # Sum of numerical values of hexadecimal digits
     toggle_value = sum(numerical_digits)
-    #print(toggle_value)
+#     print(toggle_value)
     jumper_value = WIRE_COLORS[wire_color_code]
-    # Convert sum to binary
-    #toggle_binary = bin(toggle_value)[2:].zfill(4)
-    #print(toggle_binary)
+    print(jumper_value)
+    
+    wires_list = [1]  *5
+    
+    wire_index = list(WIRE_COLORS.keys()).index(wire_color_code)
+    
+    wires_list[wire_index] = 0
+    wires_list = ''.join(map(str, wires_list))
+    wires_list = int(wires_list, 2)
+    print(wires_list)
 
+    
     random_letter1 = choice([chr(n) for n in range(70, 91)])
     random_letter2 = choice([chr(n) for n in range(70, 91)])
     serial =  random_letter1 + wire_color_code + random_letter2
 
-    return serial, toggle_value, jumper_value, wire_color_code
+    return serial, toggle_value, wires_list, wire_color_code
 
 # generates the keypad combination from a keyword and rotation key
 def genKeypadCombination():
@@ -208,7 +220,7 @@ elif (button_color == "B"):
 if (DEBUG):
     print(f"Serial number: {serial}")
     print(f"Toggles target: {bin(toggles_target)[2:].zfill(4)}/{toggles_target}")
-    print(f"Wires target: {bin(wires_target)[2:].zfill(5)}/{wires_target}")
+    print(f"Wires target: {wires_target}/{wires_target}")
     print(f"Keypad target: {keypad_target}/{passphrase}/{keyword}/{cipher_keyword}(rot={rot})")
     print(f"Button target: {button_target}")
 
