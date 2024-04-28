@@ -46,13 +46,13 @@ def setup_phases():
     # setup the keypad thread
     keypad = Keypad(component_keypad, keypad_target)
     # setup the jumper wires thread
-    wires = Wires(component_wires, wires_target)
+    wires = Wires(component_wires, wires_target, display_length = 5)
     # setup the pushbutton thread
     button = Button(component_button_state, component_button_RGB, button_target, button_color, timer)
     # bind the pushbutton to the LCD GUI so that its LED can be turned off when we quit
     gui.setButton(button)
     # setup the toggle switches thread
-    toggles = Toggles(component_toggles, toggles_target)
+    toggles = Toggles(component_toggles, toggles_target, display_length = 4)
 
     # start the phase threads
     timer.start()
@@ -117,15 +117,15 @@ def check_phases():
             # reset the button
             button._failed = False
     # check the toggles
-    if (toggles._running):
+    if toggles._running:
         # update the GUI
         gui._ltoggles["text"] = f"Toggles: {toggles}"
         # the phase is defused -> stop the thread
-        if (toggles._defused):
+        if toggles._defused:
             toggles._running = False
             active_phases -= 1
         # the phase has failed -> strike
-        elif (toggles._failed):
+        elif toggles._failed:
             strike()
             # reset the toggles
             toggles._failed = False
