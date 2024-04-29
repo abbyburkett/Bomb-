@@ -100,6 +100,13 @@ class Lcd(Frame):
             self._bquit.destroy()
 
         # reconfigure the GUI
+        if (success):
+            image = PhotoImage(file=SUCCESS[1])
+        else:
+            image = PhotoImage(file=EXPLODE[1])
+        self._lscroll["image"] = image
+        self._lscroll.image = image
+        self._lscroll.grid(row=0, column=0, columnspan=3, sticky=EW)
         # the retry button
         self._bretry = tkinter.Button(self, bg="red", fg="white", font=("Courier New", 18), text="Retry", anchor=CENTER, command=self.retry)
         self._bretry.grid(row=1, column=0, pady=40)
@@ -107,9 +114,9 @@ class Lcd(Frame):
         self._bquit = tkinter.Button(self, bg="red", fg="white", font=("Courier New", 18), text="Quit", anchor=CENTER, command=self.quit)
         self._bquit.grid(row=1, column=2, pady=40)
         if (success):
-            pygame.mixer.music.load(SUCCESS)
+            pygame.mixer.music.load(SUCCESS[0])
         else:
-            pygame.mixer.music.load(EXPLODE)
+            pygame.mixer.music.load(EXPLODE[0])
         pygame.mixer.music.play(1)
     # re-attempts the bomb (after an explosion or a successful defusion)
     def retry(self):
