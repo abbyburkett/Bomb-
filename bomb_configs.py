@@ -113,25 +113,31 @@ WIRE_COLORS = {
 def genSerial():
     # Generate wire color code
     wire_color_code = choice(list(WIRE_COLORS.keys()))
-    print(wire_color_code)
     
+    # Create variable that take the numerical digits from the serial code
     numerical_digits = [int(digit) for digit in wire_color_code if digit.isdigit()]
     # Sum of numerical values of hexadecimal digits
     toggle_value = sum(numerical_digits)
-#     print(toggle_value)
-    jumper_value = WIRE_COLORS[wire_color_code]
-    print(jumper_value)
-    
-    wires_list = [1]  *5
-    
-    wire_index = list(WIRE_COLORS.keys()).index(wire_color_code)
-    
-    wires_list[wire_index] = 0
-    wires_list = ''.join(map(str, wires_list))
-    wires_list = int(wires_list, 2)
-    print(wires_list)
 
+    # Create jumper value from the wire color dictionary
+    jumper_value = WIRE_COLORS[wire_color_code]
     
+    #create a list of '1s'
+    wires_list = [1]  *5
+
+    #get the index from the wire color that is chosen and create list
+    wire_index = list(WIRE_COLORS.keys()).index(wire_color_code)
+
+    # if thats the wire to cut, put a zero for the target
+    wires_list[wire_index] = 0
+    
+    #convert list to string
+    wires_list = ''.join(map(str, wires_list))
+    #convert string to integer
+    wires_list = int(wires_list, 2)
+    
+
+    #add random letters before and after the wire color code to create serial number
     random_letter1 = choice([chr(n) for n in range(70, 91)])
     random_letter2 = choice([chr(n) for n in range(70, 91)])
     serial =  random_letter1 + wire_color_code + random_letter2
@@ -192,8 +198,6 @@ def genKeypadCombination():
 
     return keyword, cipher_keyword, rot, combination, passphrase
 
-#def gen_toggles_target():
-    #return sum([randint(0,1) * 2 ** i for i in range(4)])
 ###############################
 # generate the bomb's specifics
 ###############################
