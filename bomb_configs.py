@@ -1,18 +1,22 @@
 #################################
 # CSC 102 Defuse the Bomb Project
 # Configuration file
-# Team: 
+# Team: Lancaster, Burkett, Chiaradio
 #################################
 
 # constants
 DEBUG = 1       # debug mode?
 RPi = True           # is this running on the RPi?
-ANIMATE = False       # animate the LCD text?
+ANIMATE = True       # animate the LCD text?
 SHOW_BUTTONS = 1 # show the Pause and Quit buttons on the main LCD GUI?
 COUNTDOWN = 300      # the initial bomb countdown value (seconds)
 NUM_STRIKES = 5      # the total strikes allowed before the bomb "explodes"
 NUM_PHASES = 4       # the total number of initial active bomb phases
-EXPLOSION_SOUND = "hq-explosion-6288.mp3"
+EXPLODE = "explosion.mp3"
+TICK = "clock-ticking.mp3"
+DEFUSED = "defused.mp3"
+STRIKE = "strike.mp3"
+SUCCESS = "success.mp3"
 # imports
 from random import randint, shuffle, choice
 from string import ascii_uppercase
