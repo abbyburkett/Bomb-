@@ -1,7 +1,7 @@
 #################################
 # CSC 102 Defuse the Bomb Project
 # GUI and Phase class definitions
-# Team: 
+# Team: Lancaster, Burkett, Chiaradio
 #################################
 
 # import the configs
@@ -9,6 +9,7 @@ from bomb_configs import *
 # other imports
 from tkinter import *
 import tkinter
+import pygame
 from threading import Thread
 from time import sleep
 import os
@@ -83,7 +84,9 @@ class Lcd(Frame):
             self._timer.pause()
 
     # setup the conclusion GUI (explosion/defusion)
-    def conclusion(self, success=False):
+    def conclusion(self, exploding=False,success=False):
+        while(not exploding and pygame.mixer.music.get_busy()):
+            sleep(0.1)
         # destroy/clear widgets that are no longer needed
         self._lscroll["text"] = ""
         self._ltimer.destroy()
@@ -103,7 +106,11 @@ class Lcd(Frame):
         # the quit button
         self._bquit = tkinter.Button(self, bg="red", fg="white", font=("Courier New", 18), text="Quit", anchor=CENTER, command=self.quit)
         self._bquit.grid(row=1, column=2, pady=40)
-
+        if (success):
+            pygame.mixer.music.load(SUCCESS)
+        else:
+            pygame.mixer.music.load(EXPLODE)
+        pygame.mixer.music.play(1)
     # re-attempts the bomb (after an explosion or a successful defusion)
     def retry(self):
         # re-launch the program (and exit this one)
@@ -201,14 +208,6 @@ class NumericPhase(PhaseThread):
         else:
             return f"{bin(self._value)[2:].zfill(self._display_length)}" 
  
- 
- 
-# class NumericPhase(PhaseThread):
-#     def __init__(self,  name, component=None, target=None):
-#         super().__init__(name, component, target)
-#     
-#     def run(self):
-#         pass
 
 # the timer phase
 class Timer(PhaseThread):
@@ -295,48 +294,10 @@ class Keypad(PhaseThread):
         else:
             return self._value
 
-
-
 class Wires(NumericPhase):
     def __init__(self, component, target, display_length, name="Wires"):
         super().__init__(name, component, target, display_length)
 
-    # returns the jumper wires state as a string
-    def __str__(self):
-        if (self._defused):
-            return "DEFUSED"
-        else:
-            return "NOT DEFUSED"
-# # the jumper wires phase
-# class Wires(PhaseThread):
-#     def __init__(self, component, target, name="Wires"):
-#          super().__init__(name, component, target)
-# 
-#     def get_value(self):
-#         value = None
-#         for pin in self._component:
-#             print(pin.value)
-#                
-#             
-#      # runs the thread
-#     def run(self):
-#         self._running = True
-#         while self._running:
-#             self._value = self.get_value
-#             if self._value == self._target:
-#                 self._defused = True
-#             else:
-#                 self._failed = True
-#                 self._running = False
-#             sleep(0.1)
-# 
-#     # returns the jumper wires state as a string
-#     def __str__(self):
-#         if (self._defused):
-#             return "DEFUSED"
-#         else:
-#             # TODO
-#             return "NOT DEFUSED"
 
 # the pushbutton phase
 class Button(PhaseThread):
@@ -390,68 +351,8 @@ class Button(PhaseThread):
             return str("Pressed" if self._value else "Released")
         
         
-        
-        
 class Toggles(NumericPhase):
     def __init__(self, component, target, display_length, name="Toggles"):
         super().__init__(name, component, target, display_length)       
 
-
-# #the toggle switches phase
-# class Toggles(PhaseThread):
-#     def __init__(self, component, target, name="Toggles"):
-#         super().__init__(name, component, target)
-#         self._prev_value = ""
-#         
-#         
-#     def get_bin_value(self):
-#         value = ""
-#         for pin in self._component:
-#             if (pin.value):
-#                 value += "1"
-#             else:
-#                 value += "0"
-#         return value
-#     
-#     def get_value(self):
-#         value = self.get_bin_value()
-#         value = int(value, 2)
-#         return value
-#         
-#     # runs the thread
-#     def run(self):
-#         self._running = True
-#         while self._running:
-#             #self._failed = False
-#             self._value = self.get_value()
-#             if self._value == self._target:
-#                 self._defused = True
-#             elif self._value != self._prev_value:
-#                 if self._value != self._target:
-#                     self._failed = True
-# #                 for i in range(len(self._value)):
-# #                     if self._value[i] != self._target[i]:
-# #                         self._defused = False
-# #                         self._failed = True
-# #             self._prev_value = self._value
-# #             sleep(0.1)
-# #             else:
-# #                 if self._value[i] != self._target[i]:
-# #                     self._failed = True
-# #         sleep(0.1)
-#             
-#                      
-#                       
-#                
-# 
-#         
-#     # returns the toggle switches state as a string
-#     def __str__(self):
-#         if (self._defused):
-#             return "DEFUSED"
-#         else:
-#             # TODO
-#             return "NOT DEFUSED"
         
-
-
