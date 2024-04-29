@@ -8,8 +8,7 @@
 from bomb_configs import *
 # import the phases
 from bomb_phases import *
-import pygame
-pygame.init()
+
 ###########
 # functions
 ###########
@@ -60,10 +59,16 @@ def setup_phases():
     wires.start()
     button.start()
     toggles.start()
-
+    
+    pygame.mixer.music.load(TICK)
+    pygame.mixer.music.play(-1)
 # checks the phase threads
 def check_phases():
-    global active_phases
+    global active_phases, exploding
+    
+    if (not exploding and not pygame.mixer.music.get_busy()):
+        pygame.mixer.music.load(TICK)
+        pygame.mixer.music.play(-1)
     
     # check the timer
     if (timer._running):
@@ -83,7 +88,7 @@ def check_phases():
         # the phase is defused -> stop the thread
         if (keypad._defused):
             keypad._running = False
-            active_phases -= 1
+            defused()
         # the phase has failed -> strike
         elif (keypad._failed):
             strike()
@@ -97,7 +102,7 @@ def check_phases():
         # the phase is defused -> stop the thread
         if (wires._defused):
             wires._running = False
-            active_phases -= 1
+            defused()
         # the phase has failed -> strike
         elif (wires._failed):
             strike()
@@ -110,7 +115,7 @@ def check_phases():
         # the phase is defused -> stop the thread
         if (button._defused):
             button._running = False
-            active_phases -= 1
+            defused()
         # the phase has failed -> strike
         elif (button._failed):
             strike()
@@ -123,7 +128,7 @@ def check_phases():
         # the phase is defused -> stop the thread
         if toggles._defused:
             toggles._running = False
-            active_phases -= 1
+            defused()
         # the phase has failed -> strike
         elif toggles._failed:
             strike()
@@ -136,8 +141,7 @@ def check_phases():
     if (strikes_left == 0):
         # turn off the bomb and render the conclusion GUI
         turn_off()
-        gui.after(1000, gui.conclusion, False)
-        pygame.mixer.Sound(EXPLOSION_SOUND).play()
+        gui.after(1000, gui.conclusion, exploding, False)
         # stop checking phases
         return
 
@@ -145,7 +149,7 @@ def check_phases():
     if (active_phases == 0):
         # turn off the bomb and render the conclusion GUI
         turn_off()
-        gui.after(100, gui.conclusion, True)
+        gui.after(100, gui.conclusion, exploding, True)
         # stop checking phases
         return
 
@@ -160,7 +164,17 @@ def strike():
     strikes_left -= 1
     if strikes_left == 3:
         timer._interval = 0.5
+    if (not exploding):
+        pygame.mixer.music.load(STRIKE)
+        pygame.mixer.music.play(1)
 
+def defused():
+    global active_phases
+    
+    active_phases -= 1
+    if (not exploding):
+        pygame.mixer.music.load(DEFUSED)
+        pygame.mixer.music.play(1)
 # turns off the bomb
 def turn_off():
     # stop all threads
@@ -180,7 +194,8 @@ def turn_off():
 ######
 # MAIN
 ######
-
+#initialize pygame
+pygame.init()
 # initialize the LCD GUI
 window = Tk()
 gui = Lcd(window)
@@ -188,7 +203,7 @@ gui = Lcd(window)
 # initialize the bomb strikes and active phases (i.e., not yet defused)
 strikes_left = NUM_STRIKES
 active_phases = NUM_PHASES
-
+exploding = False
 # "boot" the bomb
 gui.after(1000, bootup)
 
