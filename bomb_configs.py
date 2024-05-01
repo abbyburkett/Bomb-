@@ -16,7 +16,7 @@ EXPLODE = ["explosion.mp3", "explosion.png"]
 TICK = "clock-ticking.mp3"
 DEFUSED = "defused.mp3"
 STRIKE = "strike.mp3"
-SUCCESS = ["success.mp3", "success.jpg"]
+SUCCESS = ["success.mp3", "success.png"]
 # imports
 from random import randint, shuffle, choice
 from string import ascii_uppercase
