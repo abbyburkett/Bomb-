@@ -12,11 +12,11 @@ SHOW_BUTTONS = 1 # show the Pause and Quit buttons on the main LCD GUI?
 COUNTDOWN = 300      # the initial bomb countdown value (seconds)
 NUM_STRIKES = 5      # the total strikes allowed before the bomb "explodes"
 NUM_PHASES = 4       # the total number of initial active bomb phases
-EXPLODE = ["explosion.mp3", #add image link]
+EXPLODE = ["explosion.mp3", "explosion.png"]
 TICK = "clock-ticking.mp3"
 DEFUSED = "defused.mp3"
 STRIKE = "strike.mp3"
-SUCCESS = ["success.mp3", #add image link]
+SUCCESS = ["success.mp3", "success.jpg"]
 # imports
 from random import randint, shuffle, choice
 from string import ascii_uppercase
